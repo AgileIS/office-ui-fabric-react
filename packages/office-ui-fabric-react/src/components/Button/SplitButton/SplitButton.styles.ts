@@ -1,62 +1,75 @@
-import { ISplitButtonStyles } from '../SplitButton/SplitButton.Props';
-import {
-  ITheme,
-  mergeStyleSets
-} from '../../../Styling';
+import { IButtonStyles } from '../Button.types';
+import { ITheme, concatStyleSets, getFocusStyle } from '../../../Styling';
 import { memoizeFunction } from '../../../Utilities';
 
-const DEFAULT_BUTTON_HEIGHT = '32px';
-const DEFAULT_PADDING = '0 4px';
+export const getStyles = memoizeFunction(
+  (theme: ITheme, customStyles?: IButtonStyles): IButtonStyles => {
+    const buttonHighContrastFocus = {
+      left: -2,
+      top: -2,
+      bottom: -2,
+      right: -2,
+      border: 'none'
+    };
 
-export const getStyles = memoizeFunction((
-  theme: ITheme,
-  customStyles?: ISplitButtonStyles
-): ISplitButtonStyles => {
-  let iconButtonStyles: ISplitButtonStyles = {
-    splitButtonContainer: {
-      position: 'relative',
-      display: 'inline-block',
-      border: '1px solid transparent',
-      ':hover': {
-        border: '1px solid',
-        borderColor: theme.palette.neutralLight
+    const splitButtonStyles: IButtonStyles = {
+      splitButtonContainer: [
+        getFocusStyle(theme, 0, 'relative', buttonHighContrastFocus),
+        {
+          display: 'inline-flex'
+        }
+      ],
+      splitButtonContainerFocused: {
+        outline: 'none!important'
       },
-      ':focus': {
-        outline: 'none!important',
-        border: '1px solid',
-        borderColor: theme.palette.neutralDark
+      splitButtonMenuButton: {
+        padding: 6,
+        height: 'auto',
+        boxSizing: 'border-box',
+        border: 0,
+        borderRadius: 0,
+        outline: 'transparent',
+        userSelect: 'none',
+        display: 'inline-block',
+        textDecoration: 'none',
+        textAlign: 'center',
+        cursor: 'pointer',
+        verticalAlign: 'top',
+        width: 32,
+        marginLeft: -1
+      },
+
+      splitButtonDivider: {
+        position: 'absolute',
+        width: 1,
+        right: 31,
+        top: 8,
+        bottom: 8
+      },
+
+      splitButtonMenuButtonDisabled: {
+        pointerEvents: 'none',
+        selectors: {
+          ':hover': {
+            cursor: 'default'
+          }
+        }
+      },
+
+      splitButtonFlexContainer: {
+        display: 'flex',
+        height: '100%',
+        flexWrap: 'nowrap',
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+
+      splitButtonContainerDisabled: {
+        outline: 'none',
+        border: 'none'
       }
-    },
+    };
 
-    splitButtonContainerDisabled: {
-      position: 'absolute',
-    },
-
-    splitButtonMenuButton: {
-      backgroundColor: theme.palette.neutralLighter,
-      padding: '6px',
-      height: 'auto',
-      ':hover': {
-        backgroundColor: theme.palette.neutralLight
-      },
-    },
-
-    splitButtonMenuButtonDisabled: {
-      backgroundColor: theme.palette.neutralLighter,
-    },
-
-    splitButtonMenuIcon: {
-      color: theme.palette.neutralPrimary
-    },
-
-    splitButtonMenuIconDisabled: {
-      color: theme.palette.neutralTertiary
-    },
-
-    splitButtonMenuButtonChecked: {
-      backgroundColor: theme.palette.themePrimary,
-    },
-  };
-
-  return mergeStyleSets(iconButtonStyles, customStyles);
-});
+    return concatStyleSets(splitButtonStyles, customStyles)!;
+  }
+);

@@ -1,75 +1,125 @@
-import { IButtonStyles } from '../Button.Props';
-import { ISplitButtonStyles } from '../SplitButton/SplitButton.Props';
-import {
-  ITheme,
-  mergeStyleSets
-} from '../../../Styling';
+import { IButtonStyles } from '../Button.types';
+import { ITheme, concatStyleSets, FontWeights, HighContrastSelector } from '../../../Styling';
 import { memoizeFunction } from '../../../Utilities';
-import {
-  getStyles as getDefaultButtonStyles
-} from '../DefaultButton/DefaultButton.styles';
-import {
-  getStyles as getSplitButtonStyles
-} from '../SplitButton/SplitButton.styles';
+import { getStyles as getBaseButtonStyles } from '../BaseButton.styles';
+import { getStyles as getSplitButtonStyles } from '../SplitButton/SplitButton.styles';
+import { primaryStyles, standardStyles } from '../ButtonThemes';
 
-const DEFAULT_BUTTON_HEIGHT = '32px';
-const DEFAULT_BUTTON_MINWIDTH = '80px';
-const DEFAULT_PADDING = '0 16px';
+export const getStyles = memoizeFunction(
+  (theme: ITheme, customStyles?: IButtonStyles, primary?: boolean): IButtonStyles => {
+    const baseButtonStyles: IButtonStyles = getBaseButtonStyles(theme);
+    const splitButtonStyles: IButtonStyles = getSplitButtonStyles(theme);
+    const compoundButtonStyles: IButtonStyles = {
+      root: {
+        maxWidth: '280px',
+        minHeight: '72px',
+        height: 'auto',
+        padding: '20px'
+      },
 
-export const getStyles = memoizeFunction((
-  theme: ITheme,
-  customStyles?: IButtonStyles
-): IButtonStyles => {
-  let defaultButtonStyles: IButtonStyles = getDefaultButtonStyles(
-    theme,
-    customStyles
-  );
-  let splitButtonStyles: ISplitButtonStyles = getSplitButtonStyles(theme);
-  let compoundButtonStyles: IButtonStyles = {
-    root: {
-      maxWidth: '280px',
-      minHeight: '72px',
-      height: 'auto',
-      padding: '20px'
-    },
+      flexContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        minWidth: '100%',
+        margin: ''
+      },
 
-    flexContainer: {
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      minWidth: '100%',
-      margin: ''
-    },
+      textContainer: {
+        textAlign: 'left'
+      },
 
-    label: {
-      margin: '0 0 5px',
-      lineHeight: '100%'
-    },
+      icon: {
+        fontSize: '2em',
+        lineHeight: '1em',
+        height: '1em',
+        margin: '0px 8px 0px 0px',
+        flexBasis: '1em',
+        flexShrink: '0'
+      },
 
-    description: [
-      theme.fonts.small,
-      {
-        color: theme.palette.neutralSecondary,
-        lineHeight: '100%'
+      label: {
+        margin: '0 0 5px',
+        lineHeight: '100%',
+        fontWeight: FontWeights.semibold
+      },
+      description: [
+        theme.fonts.small,
+        {
+          lineHeight: '100%'
+        }
+      ]
+    };
+
+    const standardCompoundTheme: IButtonStyles = {
+      description: {
+        color: theme.palette.neutralSecondary
+      },
+
+      descriptionHovered: {
+        color: theme.palette.neutralDark
+      },
+
+      descriptionPressed: {
+        color: 'inherit'
+      },
+
+      descriptionChecked: {
+        color: 'inherit'
+      },
+
+      descriptionDisabled: {
+        color: 'inherit'
       }
-    ],
+    };
 
-    descriptionHovered: {
-      color: theme.palette.neutralDark
-    },
+    const primaryCompoundTheme: IButtonStyles = {
+      description: {
+        color: theme.palette.white,
+        selectors: {
+          [HighContrastSelector]: {
+            color: 'Window',
+            backgroundColor: 'WindowText',
+            MsHighContrastAdjust: 'none'
+          }
+        }
+      },
 
-    descriptionPressed: {
-      color: 'inherit'
-    },
+      descriptionHovered: {
+        color: theme.palette.white,
+        selectors: {
+          [HighContrastSelector]: {
+            color: 'Window',
+            backgroundColor: 'Highlight',
+            MsHighContrastAdjust: 'none'
+          }
+        }
+      },
 
-    descriptionChecked: {
-      color: 'inherit'
-    },
+      descriptionPressed: {
+        color: 'inherit'
+      },
 
-    descriptionDisabled: {
-      color: 'inherit'
-    }
+      descriptionChecked: {
+        color: 'inherit'
+      },
 
-  };
+      descriptionDisabled: {
+        color: 'inherit',
+        selectors: {
+          [HighContrastSelector]: {
+            color: 'inherit'
+          }
+        }
+      }
+    };
 
-  return mergeStyleSets(defaultButtonStyles, compoundButtonStyles, splitButtonStyles, customStyles);
-});
+    return concatStyleSets(
+      baseButtonStyles,
+      compoundButtonStyles,
+      primary ? primaryStyles(theme) : standardStyles(theme),
+      primary ? primaryCompoundTheme : standardCompoundTheme,
+      splitButtonStyles,
+      customStyles
+    )!;
+  }
+);

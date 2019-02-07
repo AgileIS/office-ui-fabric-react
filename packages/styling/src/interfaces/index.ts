@@ -1,8 +1,8 @@
-export { IProcessedStyle } from './IProcessedStyle';
-export { IRawStyle } from './IRawStyle';
-export { IStyle } from './IStyle';
-export { IAnimationStyles } from './IAnimationStyles';
+export { IAnimationStyles, IAnimationVariables } from './IAnimationStyles';
+export { IFontStyles } from './IFontStyles';
 export { IPalette } from './IPalette';
 export { ISemanticColors } from './ISemanticColors';
-export { IFontStyles } from './IFontStyles';
-export { ITheme, IPartialTheme } from './ITheme';
+export { ISemanticTextColors } from './ISemanticTextColors';
+export { ISpacing } from './ISpacing';
+export { ITheme, IPartialTheme, IScheme, ISchemeNames } from './ITheme';
+export { IEffects } from './IEffects';

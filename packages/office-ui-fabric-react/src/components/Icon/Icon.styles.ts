@@ -1,31 +1,25 @@
-import {
-  mergeStyles,
-  mergeStyleSets,
-  ITheme,
-  getTheme
-} from '../../Styling';
-import {
-  memoizeFunction
-} from '../../Utilities';
-import { IIconStyles } from './Icon.Props';
+import { IIconStyleProps, IIconStyles } from './Icon.types';
 
-export const getStyles = memoizeFunction((
-  theme: ITheme = getTheme(),
-  customStyles: IIconStyles = undefined
-): IIconStyles => {
-  let iconStyles = {
+export const getStyles = (props: IIconStyleProps): IIconStyles => {
+  const { className, iconClassName, isPlaceholder, isImage, styles } = props;
 
-    root: mergeStyles([
-      theme.fonts.icon,
+  return {
+    root: [
+      isImage && 'ms-Icon-imageContainer',
+      isPlaceholder && 'ms-Icon-placeHolder',
       {
         display: 'inline-block'
-      }
-    ]),
-
-    imageContainer: mergeStyles({
-      overflow: 'hidden'
-    })
+      },
+      isPlaceholder && {
+        width: '1em'
+      },
+      isImage && {
+        overflow: 'hidden'
+      },
+      iconClassName,
+      className,
+      styles && styles.root,
+      styles && styles.imageContainer
+    ]
   };
-
-  return mergeStyleSets(iconStyles, customStyles);
-});
+};

@@ -1,46 +1,67 @@
-/* tslint:disable:no-unused-variable */
 import * as React from 'react';
-/* tslint:enable:no-unused-variable */
+import * as renderer from 'react-test-renderer';
 
-import * as ReactDOM from 'react-dom';
-
-let { expect } = chai;
-
+import { PanelBase } from './Panel.base';
 import { Panel } from './Panel';
-
 let div: HTMLElement;
 
+const ReactDOM = require('react-dom');
+
 describe('Panel', () => {
-  beforeEach(() => {
-    div = document.createElement('div');
+  it('renders Panel correctly', () => {
+    // Mock createPortal to capture its component hierarchy in snapshot output.
+    ReactDOM.createPortal = jest.fn(element => {
+      return element;
+    });
+
+    const component = renderer.create(
+      <Panel isOpen={true} headerText="Test Panel">
+        <span>Content goes here</span>
+      </Panel>
+    );
+
+    expect(component.toJSON()).toMatchSnapshot();
+
+    ReactDOM.createPortal.mockClear();
   });
 
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(div);
-  });
+  describe('onClose', () => {
+    beforeEach(() => {
+      div = document.createElement('div');
+    });
 
-  it('fires the correct events when closing', (done) => {
-    let dismissedCalled = false;
-    let dismissCalled = false;
-    let panel: Panel = ReactDOM.render(
-      <Panel
-        isOpen={ true }
-        onDismiss={ () => { dismissCalled = true; } }
-        onDismissed={ () => dismissedCalled = true } />,
-      div) as any;
+    afterEach(() => {
+      ReactDOM.unmountComponentAtNode(div);
+    });
 
-    panel.dismiss();
+    it('fires the correct events when closing', done => {
+      let dismissedCalled = false;
+      let dismissCalled = false;
+      const setDismissTrue = (): void => {
+        dismissCalled = true;
+      };
+      const setDismissedTrue = (): void => {
+        dismissedCalled = true;
+      };
 
-    expect(dismissCalled).equals(true, 'onDismiss was not called');
-    expect(dismissedCalled).equals(false, 'onDismissed was called prematurely');
+      const panel: PanelBase = ReactDOM.render(
+        <PanelBase isOpen={true} onDismiss={setDismissTrue} onDismissed={setDismissedTrue} />,
+        div
+      ) as any;
 
-    setTimeout(() => {
-      try {
-        expect(dismissedCalled).equals(true, 'onDismissed not called');
-        done();
-      } catch (e) {
-        done(e);
-      }
-    }, 250);
+      panel.dismiss();
+
+      expect(dismissCalled).toEqual(true);
+      expect(dismissedCalled).toEqual(false);
+
+      setTimeout(() => {
+        try {
+          expect(dismissedCalled).toEqual(true);
+          done();
+        } catch (e) {
+          done(e);
+        }
+      }, 250);
+    });
   });
 });

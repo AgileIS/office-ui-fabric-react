@@ -1,18 +1,23 @@
+import { Stylesheet } from '@uifabric/merge-styles';
+
 // Initialize global window id.
 const CURRENT_ID_PROPERTY = '__currentId__';
+const DEFAULT_ID_STRING = 'id__';
 
-declare const process: any;
+declare const process: {};
 
-let _global = (typeof window !== 'undefined' && window) || process;
+// tslint:disable-next-line:no-any
+let _global: any = (typeof window !== 'undefined' && window) || process;
 
 if (_global[CURRENT_ID_PROPERTY] === undefined) {
   _global[CURRENT_ID_PROPERTY] = 0;
 }
 
-function checkProperties(a: any, b: any) {
+// tslint:disable-next-line:no-any
+function checkProperties(a: any, b: any): boolean {
   for (let propName in a) {
     if (a.hasOwnProperty(propName)) {
-      if (!b.hasOwnProperty(propName) || (b[propName] !== a[propName])) {
+      if (!b.hasOwnProperty(propName) || b[propName] !== a[propName]) {
         return false;
       }
     }
@@ -26,7 +31,7 @@ function checkProperties(a: any, b: any) {
  *
  * @public
  */
-export function shallowCompare(a: any, b: any) {
+export function shallowCompare<TA, TB>(a: TA, b: TB): boolean {
   return checkProperties(a, b) && checkProperties(b, a);
 }
 
@@ -40,6 +45,7 @@ export function shallowCompare(a: any, b: any) {
  * @param args - One or more objects that will be mixed into the target in the order they are provided.
  * @returns Resulting merged target.
  */
+// tslint:disable-next-line:no-any
 export function assign(target: any, ...args: any[]): any {
   return filteredAssign.apply(this, [null, target].concat(args));
 }
@@ -56,14 +62,14 @@ export function assign(target: any, ...args: any[]): any {
  * @param args - One or more objects that will be mixed into the target in the order they are provided.
  * @returns Resulting merged target.
  */
-export function filteredAssign(isAllowed: (propName: string) => boolean, target: any, ...args: any[]) {
+// tslint:disable-next-line:no-any
+export function filteredAssign(isAllowed: (propName: string) => boolean, target: any, ...args: any[]): any {
   target = target || {};
 
   for (let sourceObject of args) {
     if (sourceObject) {
       for (let propName in sourceObject) {
-        if (sourceObject.hasOwnProperty(propName) &&
-          !isAllowed || isAllowed(propName)) {
+        if (sourceObject.hasOwnProperty(propName) && (!isAllowed || isAllowed(propName))) {
           target[propName] = sourceObject[propName];
         }
       }
@@ -71,6 +77,13 @@ export function filteredAssign(isAllowed: (propName: string) => boolean, target:
   }
 
   return target;
+}
+
+// Configure ids to reset on stylesheet resets.
+const stylesheet = Stylesheet.getInstance();
+
+if (stylesheet && stylesheet.onReset) {
+  stylesheet.onReset(resetIds);
 }
 
 /**
@@ -81,5 +94,48 @@ export function filteredAssign(isAllowed: (propName: string) => boolean, target:
 export function getId(prefix?: string): string {
   let index = _global[CURRENT_ID_PROPERTY]++;
 
-  return (prefix || '') + index;
+  return (prefix || DEFAULT_ID_STRING) + index;
+}
+
+/**
+ * Resets id counter to an (optional) number.
+ *
+ * @public
+ */
+export function resetIds(counter: number = 0): void {
+  _global[CURRENT_ID_PROPERTY] = counter;
+}
+
+/* Takes an enum and iterates over each value of the enum (as a string), running the callback on each, returning a mapped array.
+ * The callback takes as a first parameter the string that represents the name of the entry, and the second parameter is the
+ * value of that entry, which is the value you'd normally use when using the enum (usually a number).
+ * */
+export function mapEnumByName<T>(
+  // tslint:disable-next-line:no-any
+  theEnum: any,
+  callback: (name?: string, value?: string | number) => T | undefined
+): (T | undefined)[] | undefined {
+  // map<any> to satisfy compiler since it doesn't realize we strip out undefineds in the .filter() call
+  return Object.keys(theEnum)
+    .map<T | undefined>((p: string | number) => {
+      // map on each property name as a string
+      if (String(Number(p)) !== p) {
+        // if the property is not just a number (because enums in TypeScript will map both ways)
+        return callback(p as string, theEnum[p]);
+      }
+    })
+    .filter((v: T | undefined) => !!v); // only return elements with values
+}
+
+/**
+ * Get all values in an object dictionary
+ *
+ * @param obj - The dictionary to get values for
+ */
+// tslint:disable-next-line:no-any
+export function values<T>(obj: any): T[] {
+  return Object.keys(obj).reduce((arr: T[], key: string): T[] => {
+    arr.push(obj[key]);
+    return arr;
+  }, []);
 }

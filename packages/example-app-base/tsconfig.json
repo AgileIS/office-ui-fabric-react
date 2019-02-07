@@ -11,20 +11,10 @@
     "noImplicitAny": false,
     "strictNullChecks": true,
     "moduleResolution": "node",
-    "lib": [
-      "es2017",
-      "dom"
-    ],
-    "types": [
-      "chai",
-      "mocha",
-      "webpack-env"
-    ]
+    "preserveConstEnums": true,
+    "outDir": "lib",
+    "lib": ["es2017", "dom"],
+    "types": ["webpack-env", "jest"]
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "lib",
-    "lib-amd"
-  ]
+  "include": ["src"]
 }

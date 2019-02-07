@@ -1,9 +1,14 @@
+export { buildClassMap } from './buildClassMap';
+
 export {
-  mergeStyles
-} from './mergeStyles';
-export {
-  mergeStyleSets
-} from './mergeStyleSets';
-export {
-  buildClassMap
-} from './buildClassMap';
+  IIconRecord,
+  IIconSubset,
+  IIconOptions,
+  getIcon,
+  registerIcons,
+  registerIconAlias,
+  unregisterIcons,
+  setIconOptions
+} from './icons';
+
+export { getIconClassName } from './getIconClassName';

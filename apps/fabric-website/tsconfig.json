@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "outDir": "lib",
     "target": "es5",
     "module": "commonjs",
     "jsx": "react",
@@ -10,22 +11,11 @@
     "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
-    "types": [
-      "chai",
-      "mocha",
-      "node",
-      "webpack-env"
-    ],
+    "preserveConstEnums": true,
+    "types": ["node", "webpack-env"],
     "paths": {
-      "office-ui-fabric-react/lib/*": [
-        "node_modules/office-ui-fabric-react/lib/*"
-      ]
+      "office-ui-fabric-react/lib/*": ["node_modules/office-ui-fabric-react/lib/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "lib",
-    "lib-amd"
-  ]
+  "include": ["src"]
 }

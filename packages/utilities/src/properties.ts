@@ -215,19 +215,14 @@ export const htmlElementProperties = baseElementProperties.concat(baseElementEve
  *
  * @public
  */
-export const anchorProperties = htmlElementProperties.concat([
-  'href',
-  'target'
-]);
+export const anchorProperties = htmlElementProperties.concat(['href', 'target']);
 
 /**
  * An array of BUTTON tag properties and events.
  *
  * @public
  */
-export const buttonProperties = htmlElementProperties.concat([
-  'disabled'
-]);
+export const buttonProperties = htmlElementProperties.concat(['disabled']);
 
 /**
  * An array of DIV tag properties and events.
@@ -271,15 +266,15 @@ export const imageProperties = divProperties;
  * @param allowedPropsNames-  The array of allowed propnames.
  * @returns The filtered props
  */
-export function getNativeProps<T>(props: any, allowedPropNames: string[], excludedPropNames?: string[]): T {
-  return filteredAssign((propName) => {
-    return (
-      (!excludedPropNames || excludedPropNames.indexOf(propName) < 0) && (
-        (propName.indexOf('data-') === 0) ||
-        (propName.indexOf('aria-') === 0) ||
-        (allowedPropNames.indexOf(propName) >= 0)
-      ));
-  },
+export function getNativeProps<T>(props: {}, allowedPropNames: string[], excludedPropNames?: string[]): T {
+  return filteredAssign(
+    (propName: string) => {
+      return (
+        (!excludedPropNames || excludedPropNames.indexOf(propName) < 0) &&
+        (propName.indexOf('data-') === 0 || propName.indexOf('aria-') === 0 || allowedPropNames.indexOf(propName) >= 0)
+      );
+    },
     {},
-    props) as T;
+    props
+  ) as T;
 }

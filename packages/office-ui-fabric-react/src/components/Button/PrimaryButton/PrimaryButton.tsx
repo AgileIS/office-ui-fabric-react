@@ -1,28 +1,16 @@
 import * as React from 'react';
 import { BaseComponent, customizable, nullRender } from '../../../Utilities';
-import { ThemeSettingName } from '../../../Styling';
-import { BaseButton } from '../BaseButton';
-import { IButtonProps } from '../Button.Props';
-import { getStyles } from './PrimaryButton.styles';
+import { DefaultButton } from '../DefaultButton/DefaultButton';
+import { IButtonProps } from '../Button.types';
 
-@customizable([ThemeSettingName])
-
+@customizable('PrimaryButton', ['theme', 'styles'], true)
 export class PrimaryButton extends BaseComponent<IButtonProps, {}> {
   /**
-   * Set this BaseComponent._resolveComponentRef to false, bypassing resolution of componentRef.
+   * Set this BaseComponent._skipComponentRefResolution to true, bypassing resolution of componentRef.
    */
-  protected _shouldUpdateComponentRef = false;
+  protected _skipComponentRefResolution = true;
 
-  public render() {
-    const { theme, styles } = this.props;
-
-    return (
-      <BaseButton
-        { ...this.props }
-        variantClassName='ms-Button--primary'
-        onRenderDescription={ nullRender }
-        styles={ getStyles(theme, styles) }
-      />
-    );
+  public render(): JSX.Element {
+    return <DefaultButton {...this.props} primary={true} onRenderDescription={nullRender} />;
   }
 }

@@ -3,22 +3,29 @@ import {
   DocumentCard,
   DocumentCardActions,
   DocumentCardActivity,
+  DocumentCardDetails,
+  DocumentCardImage,
   DocumentCardLocation,
   DocumentCardPreview,
   DocumentCardTitle,
-  IDocumentCardPreviewProps
+  DocumentCardLogo,
+  DocumentCardStatus,
+  IDocumentCardPreviewProps,
+  IDocumentCardLogoProps
 } from 'office-ui-fabric-react/lib/DocumentCard';
 import { ImageFit } from 'office-ui-fabric-react/lib/Image';
 import { TestImages } from '../../../common/TestImages';
 
 export class DocumentCardCompleteExample extends React.Component<any, any> {
-  public render() {
-    let previewProps: IDocumentCardPreviewProps = {
+  public render(): JSX.Element {
+    const previewProps: IDocumentCardPreviewProps = {
       getOverflowDocumentCountText: (overflowCount: number) => `+${overflowCount} more`,
       previewImages: [
         {
           name: '2016 Conference Presentation',
-          url: 'http://bing.com',
+          linkProps: {
+            href: 'http://bing.com'
+          },
           previewImageSrc: TestImages.documentPreview,
           iconSrc: TestImages.iconPpt,
           imageFit: ImageFit.cover,
@@ -27,7 +34,9 @@ export class DocumentCardCompleteExample extends React.Component<any, any> {
         },
         {
           name: 'New Contoso Collaboration for Conference Presentation Draft',
-          url: 'http://bing.com',
+          linkProps: {
+            href: 'http://bing.com'
+          },
           previewImageSrc: TestImages.documentPreviewTwo,
           iconSrc: TestImages.iconPpt,
           imageFit: ImageFit.cover,
@@ -36,7 +45,9 @@ export class DocumentCardCompleteExample extends React.Component<any, any> {
         },
         {
           name: 'Spec Sheet for design',
-          url: 'http://bing.com',
+          linkProps: {
+            href: 'http://bing.com'
+          },
           previewImageSrc: TestImages.documentPreviewThree,
           iconSrc: TestImages.iconPpt,
           imageFit: ImageFit.cover,
@@ -45,7 +56,9 @@ export class DocumentCardCompleteExample extends React.Component<any, any> {
         },
         {
           name: 'Contoso Marketing Presentation',
-          url: 'http://bing.com',
+          linkProps: {
+            href: 'http://bing.com'
+          },
           previewImageSrc: TestImages.documentPreview,
           iconSrc: TestImages.iconPpt,
           imageFit: ImageFit.cover,
@@ -54,7 +67,9 @@ export class DocumentCardCompleteExample extends React.Component<any, any> {
         },
         {
           name: 'Notes from Ignite conference',
-          url: 'http://bing.com',
+          linkProps: {
+            href: 'http://bing.com'
+          },
           previewImageSrc: TestImages.documentPreviewTwo,
           iconSrc: TestImages.iconPpt,
           imageFit: ImageFit.cover,
@@ -63,37 +78,52 @@ export class DocumentCardCompleteExample extends React.Component<any, any> {
         },
         {
           name: 'FY17 Cost Projections',
-          url: 'http://bing.com',
+          linkProps: {
+            href: 'http://bing.com'
+          },
           previewImageSrc: TestImages.documentPreviewThree,
           iconSrc: TestImages.iconPpt,
           imageFit: ImageFit.cover,
           width: 318,
           height: 196
         }
-      ],
+      ]
+    };
 
+    const previewPropsUsingIcon: IDocumentCardPreviewProps = {
+      previewImages: [
+        {
+          previewIconProps: { iconName: 'OpenFile', styles: { root: { fontSize: 42, color: '#ffffff' } } },
+          width: 318,
+          height: 196
+        }
+      ]
+    };
+
+    const logoProps: IDocumentCardLogoProps = {
+      logoIcon: 'OutlookLogo'
     };
 
     return (
-      <DocumentCard
-        onClick={ () => { console.log('You clicked the card.'); } }
-      >
-        <DocumentCardPreview { ...previewProps } />
-        <DocumentCardLocation location='Marketing Documents' locationHref='http://microsoft.com' ariaLabel='Location, Marketing Documents' />
-        <DocumentCardTitle title='6 files were uploaded' />
-        <DocumentCardActivity
-          activity='Created Feb 23, 2016'
-          people={
-            [
+      <div>
+        <DocumentCard onClick={this._onClick}>
+          <DocumentCardPreview {...previewProps} />
+          <DocumentCardLocation
+            location="Marketing Documents"
+            locationHref="http://microsoft.com"
+            ariaLabel="Location, Marketing Documents"
+          />
+          <DocumentCardTitle title="6 files were uploaded" />
+          <DocumentCardActivity
+            activity="Created Feb 23, 2016"
+            people={[
               { name: 'Annie Lindqvist', profileImageSrc: TestImages.personaFemale },
               { name: 'Roko Kolar', profileImageSrc: '', initials: 'JH' },
               { name: 'Greta Lundberg', profileImageSrc: TestImages.personaFemale }
-            ]
-          }
-        />
-        <DocumentCardActions
-          actions={
-            [
+            ]}
+          />
+          <DocumentCardActions
+            actions={[
               {
                 iconProps: { iconName: 'Share' },
                 onClick: (ev: any) => {
@@ -120,13 +150,128 @@ export class DocumentCardCompleteExample extends React.Component<any, any> {
                   ev.stopPropagation();
                 },
                 ariaLabel: 'ringer action'
-              },
-            ]
-          }
-          views={ 432 }
-        />
-      </DocumentCard>
+              }
+            ]}
+            views={432}
+          />
+        </DocumentCard>
+        <p />
+        Card Logo, Text Preview CardStatus are used on below examples.
+        <p />
+        <DocumentCard onClickHref="http://bing.com">
+          <DocumentCardLogo {...logoProps} />
+          <div className="ms-ConversationTile-TitlePreviewArea">
+            <DocumentCardTitle
+              title="Conversation about annual report a very long long name, Title should be truncated on the long name."
+              shouldTruncate={true}
+            />
+            <DocumentCardTitle
+              title={`This is the email content preview, please feel free to give feedback.
+                SharePoint Site Activity add conversation card! This is the last.`}
+              shouldTruncate={true}
+              showAsSecondaryTitle={true}
+            />
+            <DocumentCardStatus statusIcon="attach" status=" 3 Attachments" />
+          </div>
+          <DocumentCardActivity
+            activity="Sent March 13, 2018"
+            people={[
+              { name: 'Annie Lindqvist', profileImageSrc: TestImages.personaFemale },
+              { name: 'Roko Kolar', profileImageSrc: '', initials: 'JH' },
+              { name: 'Greta Lundberg', profileImageSrc: TestImages.personaFemale }
+            ]}
+          />
+        </DocumentCard>
+        <p />
+        <DocumentCard onClickHref="http://bing.com">
+          <DocumentCardLogo {...logoProps} />
+          <div className="ms-ConversationTile-TitlePreviewArea">
+            <DocumentCardTitle title="Conversation about annual Report" />
+            <DocumentCardTitle title="This is the email content preview, help." showAsSecondaryTitle={true} />
+            <DocumentCardStatus statusIcon="attach" status=" 3 Attachments" />
+          </div>
+          <DocumentCardActivity
+            activity="Sent March 13, 2018"
+            people={[
+              { name: 'Annie Lindqvist', profileImageSrc: TestImages.personaFemale },
+              { name: 'Roko Kolar', profileImageSrc: '', initials: 'JH' },
+              { name: 'Greta Lundberg', profileImageSrc: TestImages.personaFemale }
+            ]}
+          />
+        </DocumentCard>
+        <p />
+        <DocumentCard onClickHref="http://bing.com">
+          <DocumentCardLogo {...logoProps} />
+          <div className="ms-ConversationTile-TitlePreviewArea">
+            <DocumentCardTitle title="Conversation about annual report" shouldTruncate={true} />
+            <DocumentCardTitle
+              title="This is the email content preview, please feel free to give!"
+              shouldTruncate={true}
+              showAsSecondaryTitle={true}
+            />
+          </div>
+          <DocumentCardActivity
+            activity="Sent March 13, 2018"
+            people={[
+              { name: 'Annie Lindqvist', profileImageSrc: TestImages.personaFemale },
+              { name: 'Roko Kolar', profileImageSrc: '', initials: 'JH' },
+              { name: 'Greta Lundberg', profileImageSrc: TestImages.personaFemale }
+            ]}
+          />
+        </DocumentCard>
+        <p />
+        <DocumentCard onClickHref="http://bing.com">
+          <DocumentCardPreview {...previewPropsUsingIcon} />
+          <DocumentCardDetails>
+            <DocumentCardTitle title="View and share files" shouldTruncate={true} />
+            <DocumentCardActivity
+              activity="Created a few minutes ago"
+              people={[{ name: 'Kat Larrson', profileImageSrc: TestImages.personaFemale }]}
+            />
+          </DocumentCardDetails>
+        </DocumentCard>
+        <p />
+        <DocumentCard onClickHref="http://bing.com">
+          <DocumentCardImage
+            height={100}
+            imageFit={ImageFit.cover}
+            iconProps={{ iconName: 'OneNoteLogo', styles: { root: { color: '#813a7c' } } }}
+            imageSrc={TestImages.documentPreviewTwo}
+          />
+          <DocumentCardDetails>
+            <DocumentCardTitle title="How to make good design" shouldTruncate={true} />
+          </DocumentCardDetails>
+          <DocumentCardActivity
+            activity="Modified March 13, 2018"
+            people={[
+              { name: 'Annie Lindqvist', profileImageSrc: TestImages.personaFemale },
+              { name: 'Roko Kolar', profileImageSrc: '', initials: 'JH' }
+            ]}
+          />
+        </DocumentCard>
+        <p />
+        <DocumentCard onClickHref="http://bing.com">
+          <DocumentCardImage
+            height={150}
+            imageFit={ImageFit.cover}
+            iconProps={{
+              iconName: 'OneNoteLogo',
+              styles: { root: { color: '#813a7c', fontSize: '120px', width: '120px', height: '120px' } }
+            }}
+          />
+          <DocumentCardDetails>
+            <DocumentCardTitle title="How to make good design without an image" shouldTruncate={true} />
+          </DocumentCardDetails>
+          <DocumentCardActivity
+            activity="Modified January 1, 2019"
+            people={[{ name: 'Roko Kolar', profileImageSrc: '', initials: 'JH' }]}
+          />
+        </DocumentCard>
+      </div>
     );
   }
 
+  private _onClick(): void {
+    console.log('You clicked the card.');
+  }
 }

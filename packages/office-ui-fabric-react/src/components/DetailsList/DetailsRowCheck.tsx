@@ -1,45 +1,70 @@
-/* tslint:disable:no-unused-variable */
 import * as React from 'react';
-/* tslint:enable:no-unused-variable */
-import { css } from '../../Utilities';
+import { IDetailsRowCheckProps } from './DetailsRowCheck.types';
+import { css, styled } from '../../Utilities';
 import { Check } from '../../Check';
-import * as styles from './DetailsRowCheck.scss';
+import { ICheckStyleProps, ICheckStyles } from '../Check/Check.types';
+import { getStyles as getCheckStyles } from '../Check/Check.styles';
+import { getStyles } from './DetailsRowCheck.styles';
+import { IDetailsRowCheckStyleProps, IDetailsRowCheckStyles } from './DetailsRowCheck.types';
+import { classNamesFunction } from '../../Utilities';
 
-export interface IDetailsRowCheckProps extends React.HTMLAttributes<HTMLElement> {
-  selected?: boolean;
-  /**
-   * Deprecated at v.65.1 and will be removed by v 1.0. Use 'selected' instead.
-   * @deprecated
-   */
-  isSelected?: boolean;
-  anySelected: boolean;
-  canSelect: boolean;
-}
+const getCheckClassNames = classNamesFunction<ICheckStyleProps, ICheckStyles>();
+const getClassNames = classNamesFunction<IDetailsRowCheckStyleProps, IDetailsRowCheckStyles>();
 
-export const DetailsRowCheck = (props: IDetailsRowCheckProps) => {
+const DetailsRowCheckBase = (props: IDetailsRowCheckProps) => {
   const {
-    canSelect,
-    isSelected,
-    anySelected,
-    selected,
+    isVisible = false,
+    canSelect = false,
+    isSelected = false,
+    anySelected = false,
+    selected = false,
+    isHeader = false,
+    className,
+    checkClassName,
+    styles,
+    theme,
+    compact,
     ...buttonProps
   } = props;
 
-  let isPressed = props.isSelected || props.selected;
+  const isPressed = props.isSelected || props.selected;
 
-  return (
-    <button
-      { ...buttonProps }
-      role='checkbox'
-      className={ css('ms-DetailsRow-check', styles.check, {
-        [styles.isDisabled]: !props.canSelect,
-        'ms-DetailsRow-check--isDisabled': !props.canSelect
-      }) }
-      aria-checked={ isPressed }
-      data-selection-toggle={ true }
-      data-automationid='DetailsRowCheck'
+  const checkStyles = getCheckStyles({ theme: theme! });
+
+  const checkClassNames = getCheckClassNames(checkStyles, {
+    theme: theme!
+  });
+
+  const classNames = getClassNames(styles, {
+    theme: theme!,
+    canSelect,
+    selected: isPressed,
+    anySelected,
+    className,
+    isHeader,
+    isVisible,
+    compact
+  });
+
+  return canSelect ? (
+    <div
+      {...buttonProps}
+      role="checkbox"
+      className={css(classNames.root, classNames.check, checkClassNames.checkHost)}
+      aria-checked={isPressed}
+      data-selection-toggle={true}
+      data-automationid="DetailsRowCheck"
     >
-      <Check checked={ isPressed } />
-    </button>
+      <Check checked={isPressed} />
+    </div>
+  ) : (
+    <div {...buttonProps} className={css(classNames.root, classNames.check)} />
   );
 };
+
+export const DetailsRowCheck = styled<IDetailsRowCheckProps, IDetailsRowCheckStyleProps, IDetailsRowCheckStyles>(
+  DetailsRowCheckBase,
+  getStyles,
+  undefined,
+  { scope: 'DetailsRowCheck' }
+);

@@ -1,58 +1,31 @@
-/* tslint:disable:no-unused-variable */
+// @codepen
+
 import * as React from 'react';
-/* tslint:enable:no-unused-variable */
-import { DetailsList, DetailsRow, IDetailsRowProps, IDetailsRowCheckProps } from 'office-ui-fabric-react/lib/DetailsList';
-import { autobind, css } from 'office-ui-fabric-react/lib/Utilities';
-import { createListItems } from '@uifabric/example-app-base';
-import './DetailsListExample.scss';
+import { DetailsList, DetailsRow, IDetailsRowProps, IDetailsRowStyles } from 'office-ui-fabric-react/lib/DetailsList';
+import { createListItems, IExampleItem } from 'office-ui-fabric-react/lib/utilities/exampleData';
+import { getTheme } from 'office-ui-fabric-react/lib/Styling';
 
-let _items: any[];
+const theme = getTheme();
 
-export class DetailsListCustomRowsExample extends React.Component<any, any> {
-  constructor() {
-    super();
+export class DetailsListCustomRowsExample extends React.Component<{}, {}> {
+  private _items: IExampleItem[];
 
-    _items = _items || createListItems(500);
+  constructor(props: {}) {
+    super(props);
+    this._items = createListItems(500);
   }
 
   public render() {
-    return (
-      <DetailsList
-        items={ _items }
-        setKey='set'
-        onRenderRow={ this._onRenderRow }
-      />
-    );
+    return <DetailsList items={this._items} setKey="set" onRenderRow={this._onRenderRow} />;
   }
 
-  @autobind
-  private _onRenderRow(props: IDetailsRowProps) {
-    return (
-      <DetailsRow
-        { ...props}
-        onRenderCheck={ this._onRenderCheck }
-        aria-busy={ false }
-      />
-    );
-  }
+  private _onRenderRow = (props: IDetailsRowProps): JSX.Element => {
+    const customStyles: Partial<IDetailsRowStyles> = {};
+    if (props.itemIndex % 2 === 0) {
+      // Every other row renders with a different background color
+      customStyles.root = { backgroundColor: theme.palette.themeLighterAlt };
+    }
 
-  @autobind
-  private _onRenderCheck(props: IDetailsRowCheckProps) {
-    return (
-      <div
-        className={ css(
-          'ms-DetailsRow-check DetailsListExample-customCheck', {
-            'is-any-selected': props.anySelected
-          }) }
-        role='button'
-        aria-pressed={ props.isSelected }
-        data-selection-toggle={ true }
-      >
-        <input
-          type='checkbox'
-          checked={ props.isSelected }
-        />
-      </div>
-    );
-  }
+    return <DetailsRow {...props} styles={customStyles} />;
+  };
 }

@@ -1,237 +1,99 @@
+// @codepen
 import * as React from 'react';
 import {
   ComboBox,
-  IComboBoxOption
-} from 'office-ui-fabric-react/lib/ComboBox';
-import './ComboBox.Basic.Example.scss';
-import {
-  assign,
-  autobind
-} from 'office-ui-fabric-react/lib/Utilities';
-import { SelectableOptionMenuItemType } from 'office-ui-fabric-react/lib/utilities/selectableOption/SelectableOption.Props';
+  Fabric,
+  IComboBox,
+  IComboBoxOption,
+  mergeStyles,
+  PrimaryButton,
+  SelectableOptionMenuItemType
+} from 'office-ui-fabric-react/lib/index';
 
-export class ComboBoxBasicExample extends React.Component<any, any> {
-  private _testOptions =
-  [{ key: 'Header', text: 'Theme Fonts', itemType: SelectableOptionMenuItemType.Header },
-  { key: 'A', text: 'Arial Black' },
-  { key: 'B', text: 'Time New Roman' },
-  { key: 'C', text: 'Comic Sans MS' },
-  { key: 'divider_2', text: '-', itemType: SelectableOptionMenuItemType.Divider },
-  { key: 'Header1', text: 'Other Options', itemType: SelectableOptionMenuItemType.Header },
-  { key: 'D', text: 'Option d' },
-  { key: 'E', text: 'Option e' },
-  { key: 'F', text: 'Option f' },
-  { key: 'G', text: 'Option g' },
-  { key: 'H', text: 'Option h' },
-  { key: 'I', text: 'Option i' },
-  { key: 'J', text: 'Option j' },
-  ];
+const INITIAL_OPTIONS: IComboBoxOption[] = [
+  { key: 'Header1', text: 'First heading', itemType: SelectableOptionMenuItemType.Header },
+  { key: 'A', text: 'Option A' },
+  { key: 'B', text: 'Option B' },
+  { key: 'C', text: 'Option C' },
+  { key: 'D', text: 'Option D' },
+  { key: 'divider', text: '-', itemType: SelectableOptionMenuItemType.Divider },
+  { key: 'Header2', text: 'Second heading', itemType: SelectableOptionMenuItemType.Header },
+  { key: 'E', text: 'Option E' },
+  { key: 'F', text: 'Option F', disabled: true },
+  { key: 'G', text: 'Option G' },
+  { key: 'H', text: 'Option H' },
+  { key: 'I', text: 'Option I' },
+  { key: 'J', text: 'Option J' }
+];
 
-  private _fontMapping: { [key: string]: string } = {
-    ['Arial Black']: '"Arial Black", "Arial Black_MSFontService", sans-serif',
-    ['Time New Roman']: '"Times New Roman", "Times New Roman_MSFontService", serif',
-    ['Comic Sans MS']: '"Comic Sans MS", "Comic Sans MS_MSFontService", fantasy',
-    ['Calibri']: 'Calibri, Calibri_MSFontService, sans-serif'
-  };
-
-  constructor() {
-    super();
-    this.state = {
-      options: [],
-      selectedOptionKey: null,
-      value: 'Calibri'
-    };
+const wrapperClassName = mergeStyles({
+  selectors: {
+    '& > *': { marginBottom: '20px' },
+    '& .ms-ComboBox': { maxWidth: '300px' }
   }
+});
 
-  public render() {
-    let { options, selectedOptionKey, value } = this.state;
+// tslint:disable:jsx-no-lambda
+export class ComboBoxBasicExample extends React.Component<{}, {}> {
+  private _basicComboBox = React.createRef<IComboBox>();
 
+  public render(): JSX.Element {
     return (
-      <div className='ms-ComboBoxBasicExample'>
-
-        <ComboBox
-          defaultSelectedKey='C'
-          label='Basic uncontrolled example (allowFreeform: T, AutoComplete: T):'
-          id='Basicdrop1'
-          ariaLabel='Basic ComboBox example'
-          allowFreeform={ true }
-          autoComplete={ true }
-          options={ this._testOptions }
-          onRenderOption={ this._onRenderFontOption }
-        />
-
-        <ComboBox
-          defaultSelectedKey='C'
-          label='Basic uncontrolled example (allowFreeform: T, AutoComplete: F):'
-          id='Basicdrop2'
-          ariaLabel='Basic ComboBox example'
-          allowFreeform={ true }
-          autoComplete={ false }
-          options={ this._testOptions }
-          onRenderOption={ this._onRenderFontOption }
-        />
-
-        <ComboBox
-          selectedKey='C'
-          label='Basic uncontrolled example (allowFreeform: F, AutoComplete: T):'
-          id='Basicdrop3'
-          ariaLabel='Basic ComboBox example'
-          allowFreeform={ false }
-          autoComplete={ true }
-          options={ this._testOptions }
-          onRenderOption={ this._onRenderFontOption }
-        />
-
-        <ComboBox
-          defaultSelectedKey='C'
-          label='Basic uncontrolled example (allowFreeform: F, AutoComplete: F):'
-          id='Basicdrop4'
-          ariaLabel='Basic ComboBox example'
-          allowFreeform={ false }
-          autoComplete={ false }
-          options={ this._testOptions }
-          onRenderOption={ this._onRenderFontOption }
-        />
-
-        <ComboBox
-          label='Basic uncontrolled example:'
-          id='Basicdrop5'
-          ariaLabel='Basic ComboBox example'
-          errorMessage='Error! Here is some text!'
-          options={ this._testOptions }
-          onRenderOption={ this._onRenderFontOption }
-        />
-
-        <ComboBox
-          label='Disabled uncontrolled example with defaultSelectedKey:'
-          defaultSelectedKey='D'
-          options={
-            [
-              { key: 'A', text: 'Option a' },
-              { key: 'B', text: 'Option b' },
-              { key: 'C', text: 'Option c' },
-              { key: 'D', text: 'Option d' },
-              { key: 'E', text: 'Option e' },
-              { key: 'F', text: 'Option f' },
-              { key: 'G', text: 'Option g' },
-            ]
-          }
-          disabled={ true }
-        />
-
-        { value ?
+      <Fabric className={wrapperClassName}>
+        <div>
+          {/* This example demonstrates various props, but only `options` is required. */}
           <ComboBox
-            label='Basic controlled example:'
-            id='Basicdrop5'
-            ariaLabel='Basic ComboBox example'
-            allowFreeform={ true }
-            autoComplete={ true }
-            options={ options }
-            onChanged={ this._onChanged }
-            onResolveOptions={ this._getOptions }
-            value={ value && value }
-            onRenderOption={ this._onRenderFontOption }
+            defaultSelectedKey="C"
+            label="Single-select ComboBox (uncontrolled, allowFreeform: T, autoComplete: T)"
+            allowFreeform
+            autoComplete="on"
+            options={INITIAL_OPTIONS}
+            componentRef={this._basicComboBox}
+            onFocus={() => console.log('onFocus called for basic uncontrolled example')}
+            onBlur={() => console.log('onBlur called for basic uncontrolled example')}
+            onMenuOpen={() => console.log('ComboBox menu opened')}
+            onPendingValueChanged={(option, pendingIndex, pendingValue) =>
+              console.log(`Preview value was changed. Pending index: ${pendingIndex}. Pending value: ${pendingValue}.`)
+            }
           />
-          :
-          <ComboBox
-            selectedKey={ selectedOptionKey && selectedOptionKey }
-            label='Basic controlled example:'
-            id='Basicdrop5'
-            ariaLabel='Basic ComboBox example'
-            allowFreeform={ true }
-            autoComplete={ true }
-            options={ options }
-            onChanged={ this._onChanged }
-            onResolveOptions={ this._getOptions }
-            onRenderOption={ this._onRenderFontOption }
+
+          <PrimaryButton
+            text="Open ComboBox"
+            style={{ display: 'block', marginTop: '10px' }}
+            onClick={() => {
+              if (this._basicComboBox.current) {
+                this._basicComboBox.current.focus(true);
+              }
+            }}
           />
-        }
+        </div>
 
-      </div>
+        <ComboBox
+          multiSelect
+          defaultSelectedKey={['C', 'E']}
+          label="Multi-select ComboBox (uncontrolled)"
+          allowFreeform
+          autoComplete="on"
+          options={INITIAL_OPTIONS}
+        />
 
+        <ComboBox
+          label="ComboBox with placeholder text"
+          placeholder="Select or type an option"
+          allowFreeform
+          autoComplete="on"
+          options={INITIAL_OPTIONS}
+        />
+
+        <ComboBox
+          label="ComboBox with error message"
+          defaultSelectedKey="B"
+          errorMessage="Oh no! This ComboBox has an error!"
+          options={INITIAL_OPTIONS}
+        />
+
+        <ComboBox disabled label="Disabled ComboBox" defaultSelectedKey="D" options={INITIAL_OPTIONS} />
+      </Fabric>
     );
-  }
-
-  // Render content of item
-  @autobind
-  private _onRenderFontOption(item: IComboBoxOption): JSX.Element {
-
-    if (item.itemType === SelectableOptionMenuItemType.Header ||
-      item.itemType === SelectableOptionMenuItemType.Divider) {
-      return <span className={ 'ms-ComboBox-optionText' }>{ item.text }</span>;
-    }
-
-    let fontFamily = this._fontMapping[item.text];
-
-    if (fontFamily === null || fontFamily === undefined) {
-      let newFontFamily: string = item.text;
-      if (newFontFamily.indexOf(' ') > -1) {
-        newFontFamily = '"' + newFontFamily + '"';
-      }
-
-      // add a default fallback font
-      newFontFamily += ',"Segoe UI",Tahoma,Sans-Serif';
-
-      this._fontMapping = assign({}, this._fontMapping, { [fontFamily]: newFontFamily });
-      fontFamily = newFontFamily;
-    }
-
-    return <span className={ 'ms-ComboBox-optionText' } style={ { fontFamily: fontFamily && fontFamily } }>{ item.text }</span>;
-  }
-
-  @autobind
-  private _getOptions(currentOptions: IComboBoxOption[]): IComboBoxOption[] {
-
-    if (this.state.options.length > 0) {
-      return this.state.options;
-    }
-
-    let newOptions =
-      [
-        { key: 'Header', text: 'Theme Fonts', itemType: SelectableOptionMenuItemType.Header },
-        { key: 'A', text: 'Arial Black', fontFamily: '"Arial Black", "Arial Black_MSFontService", sans-serif' },
-        { key: 'B', text: 'Time New Roman', fontFamily: '"Times New Roman", "Times New Roman_MSFontService", serif' },
-        { key: 'C', text: 'Comic Sans MS', fontFamily: '"Comic Sans MS", "Comic Sans MS_MSFontService", fantasy' },
-        { key: 'C1', text: 'Calibri', fontFamily: 'Calibri, Calibri_MSFontService, sans-serif' },
-        { key: 'divider_2', text: '-', itemType: SelectableOptionMenuItemType.Divider },
-        { key: 'Header1', text: 'Other Options', itemType: SelectableOptionMenuItemType.Header },
-        { key: 'D', text: 'Option d' },
-        { key: 'E', text: 'Option e' },
-        { key: 'F', text: 'Option f' },
-        { key: 'G', text: 'Option g' },
-        { key: 'H', text: 'Option h' },
-        { key: 'I', text: 'Option i' },
-        { key: 'J', text: 'Option j' }
-      ];
-    this.setState({
-      options: newOptions,
-      selectedOptionKey: 'C1',
-      value: null
-    });
-
-    return newOptions;
-  }
-
-  @autobind
-  private _onChanged(option: IComboBoxOption, index: number, value: string) {
-    if (option !== null) {
-      this.setState({
-        selectedOptionKey: option.key,
-        value: null
-      });
-    } else if (index !== null && index >= 0 && index < this.state.options.length) {
-      this.setState({
-        selectedOptionKey: this.state.options[index].key,
-        value: null
-      });
-    } else if (value !== null) {
-      let newOption: IComboBoxOption = { key: value, text: value };
-
-      this.setState({
-        options: [...this.state.options, newOption],
-        selectedOptionKey: newOption.key,
-        value: null
-      });
-    }
   }
 }

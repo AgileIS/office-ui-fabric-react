@@ -9,17 +9,23 @@ const FORMAT_REGEX = /\{\d+\}/g;
  * need to evaluate a formatted string given a tokenized string. This
  * usually only is needed in localization scenarios.
 
- * Example "I love {0} every {1}".format("CXP") will result in a Debug Exception.
+ * @example
+ * ```tsx
+ * "I love {0} every {1}".format("CXP")
+ * ```
+ * will result in a Debug Exception.
  *
  * @public
  */
+// tslint:disable-next-line:no-any
 export function format(s: string, ...values: any[]): string {
   'use strict';
 
   let args = values;
   // Callback match function
-  function replace_func(match: string) {
+  function replace_func(match: string): string {
     // looks up in the args
+    // tslint:disable-next-line:no-any
     let replacement = args[match.replace(FORMAT_ARGS_REGEX, '') as any];
 
     // catches undefined in nondebug and null in debug and nondebug
@@ -29,5 +35,5 @@ export function format(s: string, ...values: any[]): string {
 
     return replacement;
   }
-  return (s.replace(FORMAT_REGEX, replace_func));
+  return s.replace(FORMAT_REGEX, replace_func);
 }

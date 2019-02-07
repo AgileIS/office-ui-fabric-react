@@ -1,50 +1,69 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
-import { GlobalSettings, IChangeDescription } from './GlobalSettings';
+import { Customizations } from './Customizations';
+import { hoistStatics } from './hoistStatics';
+import { CustomizerContext, ICustomizerContext } from './Customizer';
+import { concatStyleSets } from '@uifabric/merge-styles';
 
-export function customizable<P>(fields: string[]) {
-  return function customizableFactory<P, S>(
-    ComposedComponent: (new (props: P, ...args: any[]) => React.Component<P, S>)
+export function customizable(
+  scope: string,
+  fields: string[],
+  concatStyles?: boolean
+  // tslint:disable-next-line:no-any
+): <P>(ComposedComponent: React.ComponentType<P>) => any {
+  // tslint:disable-next-line:no-shadowed-variable
+  return function customizableFactory<P>(
+    // tslint:disable-next-line:no-any
+    ComposedComponent: React.ComponentType<P>
+    // tslint:disable-next-line:no-any
   ): any {
-    return class ComponentWithInjectedProps extends React.Component<P, {}> {
-      public static contextTypes = {
-        injectedProps: PropTypes.object
-      };
+    const resultClass = class ComponentWithInjectedProps extends React.Component<P, {}> {
+      public static displayName: string = 'Customized' + scope;
 
-      constructor(props: P, context: any) {
-        super(props, context);
+      // tslint:disable-next-line:no-any
+      constructor(props: P) {
+        super(props);
 
         this._onSettingChanged = this._onSettingChanged.bind(this);
       }
 
-      public componentDidMount() {
-        GlobalSettings.addChangeListener(this._onSettingChanged);
+      public componentDidMount(): void {
+        Customizations.observe(this._onSettingChanged);
       }
 
-      public componentWillUnmount() {
-        GlobalSettings.removeChangeListener(this._onSettingChanged);
+      public componentWillUnmount(): void {
+        Customizations.unobserve(this._onSettingChanged);
       }
 
-      public render() {
-        let defaultProps = {};
-
-        for (let propName of fields) {
-          (defaultProps as any)[propName] = (this.context.injectedProps) ?
-            this.context.injectedProps[propName] :
-            GlobalSettings.getValue(propName);
-        }
-
+      public render(): JSX.Element {
         return (
-          <ComposedComponent { ...defaultProps } { ...this.props as any } />
+          <CustomizerContext.Consumer>
+            {(context: ICustomizerContext) => {
+              const defaultProps = Customizations.getSettings(fields, scope, context.customizations);
+
+              // tslint:disable-next-line:no-any
+              const componentProps = this.props as any;
+
+              // If defaultProps.styles is a function, evaluate it before calling concatStyleSets
+              if (defaultProps.styles && typeof defaultProps.styles === 'function') {
+                defaultProps.styles = defaultProps.styles({ ...defaultProps, ...componentProps });
+              }
+
+              if (concatStyles) {
+                const mergedStyles = concatStyleSets(defaultProps.styles, componentProps.styles);
+                return <ComposedComponent {...defaultProps} {...componentProps} styles={mergedStyles} />;
+              }
+
+              return <ComposedComponent {...defaultProps} {...componentProps} />;
+            }}
+          </CustomizerContext.Consumer>
         );
       }
 
-      private _onSettingChanged(change: IChangeDescription): void {
-        if (fields.indexOf(change.key) >= 0) {
-          this.forceUpdate();
-        }
+      private _onSettingChanged(): void {
+        this.forceUpdate();
       }
-
     };
+
+    return hoistStatics(ComposedComponent, resultClass);
   };
 }

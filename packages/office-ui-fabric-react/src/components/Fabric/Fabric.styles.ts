@@ -1,30 +1,39 @@
-
-import {
-  memoizeFunction
-} from '../../Utilities';
-import {
-  ITheme,
-  IStyle,
-  mergeStyles
-} from '../../Styling';
+import { getGlobalClassNames } from '../../Styling';
+import { IFabricStyleProps, IFabricStyles } from './Fabric.types';
 
 const inheritFont = { fontFamily: 'inherit' };
 
-export interface IFabricStyles {
-  root: IStyle;
+const GlobalClassNames = {
+  root: 'ms-Fabric'
+};
+
+export interface IFabricClassNames {
+  root: string;
 }
 
-export const getStyles = memoizeFunction((
-  theme: ITheme
-): IFabricStyles => {
+export const getStyles = (props: IFabricStyleProps): IFabricStyles => {
+  const { theme, className, isFocusVisible } = props;
+
+  const classNames = getGlobalClassNames(GlobalClassNames, theme);
+
   return {
-    root: mergeStyles([
+    root: [
+      classNames.root,
+      isFocusVisible && 'is-focusVisible',
       theme.fonts.medium,
       {
         color: theme.palette.neutralPrimary,
-        '& button': inheritFont,
-        '& input': inheritFont
-      }
-    ])
+        selectors: {
+          '& button': inheritFont,
+          '& input': inheritFont,
+          '& textarea': inheritFont,
+          ':global(button)': {
+            overflow: 'visible',
+            margin: 0
+          }
+        }
+      },
+      className
+    ]
   };
-});
+};
